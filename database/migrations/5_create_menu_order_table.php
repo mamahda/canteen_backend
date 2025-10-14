@@ -6,6 +6,9 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
         Schema::create('menu_order', function (Blueprint $table) {
@@ -13,11 +16,13 @@ return new class extends Migration
             $table->foreignId('menu_id')->constrained('menus')->onDelete('cascade');
             $table->foreignId('order_id')->constrained('orders')->onDelete('cascade');
             $table->integer('subtotal_price');
-            $table->string('type', 255);
             $table->timestamps();
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         Schema::dropIfExists('menu_order');
