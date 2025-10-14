@@ -7,9 +7,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 
-
 class AuthController
 {
+    // API untuk registrasi akun baru
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -41,6 +41,7 @@ class AuthController
         ], 201);
     }
 
+    // API untuk login user
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
