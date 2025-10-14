@@ -76,6 +76,25 @@ class AuthController
                 'user' => $user,
                 'token' => $token
             ]
-        ]);
+        ], 200);
+    }
+
+    // API untuk logout
+    public function logout(Request $request){
+        $user = Auth::user();
+
+        if(!$user){
+            return response()->json([
+                'success' => false,
+                'messege' => 'Unauthenticated',
+            ], 401);
+        }
+
+        $user->currentAccessToken()->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Logout successful',
+        ], 200);
     }
 }
