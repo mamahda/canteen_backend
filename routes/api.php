@@ -11,15 +11,19 @@ use Illuminate\Support\Facades\Route;
  *
  * Rute-rute ini dimuat oleh RouteServiceProvider dalam grup yang
  * diberi middleware 'api'.
- *
  */
 
 /**
  * Rute Publik (Tidak Perlu Otentikasi)
+ * Untuk Authentikasi login dan register user
  */
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-Route::get('/menus', [MenuController::class, 'getAllMenu']); // Diubah ke plural
+
+/** 
+ * Rute untuk menampilkan semua menu 
+ */
+Route::get('/menus', [MenuController::class, 'getAllMenu']); 
 
 /**
  * Rute Terproteksi (Membutuhkan Otentikasi Sanctum)
@@ -27,7 +31,6 @@ Route::get('/menus', [MenuController::class, 'getAllMenu']); // Diubah ke plural
 Route::middleware('auth:sanctum')->group(function () {
 	/**
 	 * Rute ini hanya bisa diakses oleh user dengan role 'admin'.
-	 * Menggunakan Gate 'admin-only' untuk otorisasi.
 	 */
 	Route::middleware('role:admin')->group(function () {
 		Route::post('/menus', [MenuController::class, 'addMenu']); // Diubah ke plural
@@ -37,7 +40,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
 	/**
 	 * Rute ini bisa diakses oleh user dengan role 'customer'.
-	 * (Kosong untuk saat ini, bisa diisi nanti)
 	 */
 	Route::middleware('role:customer')->group(function () {
 		// Contoh: Route::post('/orders', [OrderController::class, 'store']);
