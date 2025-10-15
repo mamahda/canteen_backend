@@ -90,6 +90,7 @@ class AuthController
 		$request->validate([
 			'email' => 'required|email',
 			'password' => 'required',
+			'remember_token' => 'nullable|string'
 		]);
 
 		/**
