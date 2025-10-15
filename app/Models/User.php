@@ -2,37 +2,62 @@
 
 namespace App\Models;
 
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasApiTokens;
+	use HasFactory, Notifiable, HasApiTokens;
 
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'role',
-    ];
+	/**
+	 * Atribut yang dapat diisi secara massal.
+	 *
+	 * @var array<int, string>
+	 */
+	protected $fillable = [
+		'name',
+		'email',
+		'password',
+		'role',
+	];
 
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+	/**
+	 * Atribut yang harus disembunyikan saat serialisasi.
+	 *
+	 * @var array<int, string>
+	 */
+	protected $hidden = [
+		'password',
+		'remember_token',
+	];
 
-    protected function casts(): array
-    {
-        return [
-            'password' => 'hashed',
-        ];
-    }
+	/**
+	 * Hash password secara otomatis
+	 */
+	protected function casts(): array
+	{
+		return [
+			'password' => 'hashed',
+		];
+	}
 
-    public function orders()
-    {
-        return $this->hasMany(Order::class);
-    }
+	// --- RELASI ---
 
+	/**
+	 * Relasi one-to-one: Setiap user memiliki satu cart.
+	 */
+	public function cart()
+	{
+		return $this->hasOne(Cart::class);
+	}
+
+	/**
+	 * Relasi one-to-many: Setiap user bisa memiliki banyak order.
+	 */
+	public function orders()
+	{
+		return $this->hasMany(Order::class);
+	}
 }

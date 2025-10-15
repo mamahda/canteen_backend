@@ -2,24 +2,41 @@
 
 namespace App\Models;
 
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
-class Menu extends Authenticatable
+class Menu extends Model
 {
   use HasFactory;
 
   protected $fillable = [
-        'name',
-        'price',
-        'stock',
-        'type',
+    'name',
+    'price',
+    'stock',
+    'image',
+    'type',
   ];
 
-  public function orders()
+  /**
+   * Menambahkan atribut 'image_url' secara otomatis ke model
+   * saat diubah menjadi array atau JSON.
+   */
+  protected $appends = ['image_url'];
+
+  /**
+   * Accessor untuk mendapatkan URL lengkap dari gambar.
+   * Akan membuat URL default jika tidak ada gambar.
+   *
+   * @return string
+   */
+  public function getImageUrlAttribute()
   {
-    return $this->belongsToMany(Order::class, 'menu_order')
-                ->withPivot('subtotal_price')
-                ->withTimestamps();
+    if ($this->image && Storage::disk('public')->exists($this->image)) {
+      return Storage::disk('public')->url($this->image);
+    }
+
+    // Ganti dengan path gambar default Anda
+    return asset('storage/menus/file-not-found.jpg');
   }
 }

@@ -11,12 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('menus', function (Blueprint $table) {
+        Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 255);
-            $table->integer('price');
-            $table->integer('stock');
-            $table->string('type', 255);
+            $table->string('status')->default('pending'); 
+            $table->integer('total_price');
+
+            // Relasi ke tabel users
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            
             $table->timestamps();
         });
     }
@@ -26,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('menus');
+        Schema::dropIfExists('orders');
     }
 };
