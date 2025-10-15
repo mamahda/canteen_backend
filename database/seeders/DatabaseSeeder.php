@@ -14,7 +14,7 @@ class DatabaseSeeder extends Seeder
 	 */
 	public function run(): void
 	{
-		// 1. Membuat user admin
+		/** Membuat user admin */
 		User::factory()->create([
 			'name' => 'admin',
 			'email' => 'admin@admin',
@@ -22,9 +22,9 @@ class DatabaseSeeder extends Seeder
 			'role' => 'admin',
 		]);
 
-		// 2. Data untuk Main Course
+		/** Data untuk Main Course */
 		$mainCourses = [
-			['name' => 'Nasi Goreng Spesial', 'price' => 218000],
+			['name' => 'Nasi Goreng Spesial', 'price' => 18000],
 			['name' => 'Mie Ayam Bakso', 'price' => 17000],
 			['name' => 'Soto Ayam Lamongan', 'price' => 14000],
 			['name' => 'Rawon Daging', 'price' => 20000],
@@ -44,7 +44,7 @@ class DatabaseSeeder extends Seeder
 			]);
 		}
 
-		// 3. Data untuk Snack
+		/** Data untuk Snack */
 		$snacks = [
 			['name' => 'Bakwan Jagung', 'price' => 1000],
 			['name' => 'Tahu Isi Pedas', 'price' => 1000],
@@ -66,7 +66,7 @@ class DatabaseSeeder extends Seeder
 			]);
 		}
 
-		// 4. Data untuk Beverage
+		/** Data untuk Beverage */
 		$beverages = [
 			['name' => 'Es Teh Manis', 'price' => 4000],
 			['name' => 'Es Jeruk Peras', 'price' => 5000],

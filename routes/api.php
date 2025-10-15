@@ -33,9 +33,10 @@ Route::middleware('auth:sanctum')->group(function () {
 	 * Rute ini hanya bisa diakses oleh user dengan role 'admin'.
 	 */
 	Route::middleware('role:admin')->group(function () {
-		Route::post('/menus', [MenuController::class, 'addMenu']); // Diubah ke plural
-		Route::post('/menus/image/{menu}', [MenuController::class, 'uploadMenuImage']); // Route baru
-		Route::delete('/menus/{menu}', [MenuController::class, 'deleteMenu']); // Route baru
+		Route::post('/menus', [MenuController::class, 'addMenu']);
+		Route::post('/menus/image/{menu}', [MenuController::class, 'uploadMenuImage']); 
+		Route::patch('/menus/{menu}', [MenuController::class, 'updateMenu']);
+		Route::delete('/menus/{menu}', [MenuController::class, 'deleteMenu']);
 	});
 
 	/**

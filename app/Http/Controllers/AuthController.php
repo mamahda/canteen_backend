@@ -18,34 +18,26 @@ class AuthController
 	public function register(Request $request)
 	{
 		/** Validasi input dari request. */
-		$validator = Validator::make($request->all(), [
-			'name' => 'required|string|max:255',
-			'email' => 'required|string|email|max:255|unique:users',
-			'password' => 'required|string|min:6',
+		$validatedData = $request->validate([
+			'name' => ['required', 'string', 'max:255'],
+			'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+			'password' => ['required', 'string', 'min:6'],
 		]);
-
-		if ($validator->fails()) {
-			return response()->json([
-				'success' => false,
-				'message' => 'Validation error',
-				'errors' => $validator->errors()
-			], 422);
-		}
 
 		try {
 			/**
 			 * Gunakan Database Transaction untuk memastikan pembuatan User dan Cart
 			 * berhasil sebagai satu kesatuan operasi yang tidak terpisahkan.
 			 */
-			$user = DB::transaction(function () use ($request) {
+			$user = DB::transaction(function () use ($validatedData) {
 				/**
 				 * Buat entitas User baru.
 				 * Role di-set default ke 'customer'.
 				 */
 				$createdUser = User::create([
-					'name' => $request->name,
-					'email' => $request->email,
-					'password' => Hash::make($request->password),
+					'name' => $validatedData['name'],
+					'email' => $validatedData['email'],
+					'password' => Hash::make($validatedData['password']),
 					'role' => 'customer',
 				]);
 
@@ -87,10 +79,10 @@ class AuthController
 	public function login(Request $request)
 	{
 		/** Validasi email dan password dari request. */
-		$request->validate([
-			'email' => 'required|email',
-			'password' => 'required',
-			'remember_token' => 'nullable|string'
+		$validatedData = $request->validate([
+			'email' => ['required', 'email'],
+			'password' => ['required'],
+			'remember_token' => ['nullable', 'string']
 		]);
 
 		/**
@@ -137,6 +129,14 @@ class AuthController
 		 * user yang terotentikasi dari request API yang dilindungi Sanctum.
 		 */
 		$user = $request->user();
+
+		/** Cek apakah user exist */
+		if (!$user) {
+			return response()->json([
+				'success' => false,
+				'message' => 'No authenticated user found'
+			], 401);
+		}
 
 		/**
 		 * Hapus access token yang sedang digunakan untuk request ini.

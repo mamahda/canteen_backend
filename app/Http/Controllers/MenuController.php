@@ -11,6 +11,38 @@ use Illuminate\Validation\Rule;
 class MenuController
 {
   /**
+   * FITUR READ
+   * Mendapatkan semua menu yang tersedia.
+   * Bisa diakses oleh semua user.
+   */
+  public function getAllMenu(Request $request)
+  {
+    /**
+     * Ambil nilai dari query parameter 'type'.
+     * Jika tidak ada, nilainya akan null.
+     */
+    $tipeFilter = $request->query('type');
+
+    /** Mulai query builder */
+    $query = Menu::query();
+
+    /** Jika parameter 'type' ada isinya, tambahkan filter ke query */
+    if ($tipeFilter) {
+      $query->where('type', $tipeFilter);
+    }
+
+    /** Eksekusi query dan ambil hasilnya */
+    $menus = $query->get();
+
+    return response()->json([
+      'success' => true,
+      'message' => 'List of menu items',
+      'data' => $menus
+    ], 200);
+  }
+
+  /**
+   * FITUR CREATE
    * Menambahkan menu baru ke database.
    * Hanya bisa diakses oleh admin.
    */
@@ -18,9 +50,9 @@ class MenuController
   {
     /** Validasi input. Jika gagal, otomatis mengembalikan response 422. */
     $validatedData = $request->validate([
-      'name' => 'required|string|max:255|unique:menus',
-      'price' => 'required|integer|min:0',
-      'stock' => 'required|integer|min:0',
+      'name' => ['required', 'string', 'max:255', 'unique:menus'],
+      'price' => ['required', 'integer', 'min:0'],
+      'stock' => ['required', 'integer', 'min:0'],
       'type' => ['required', 'string', Rule::in(['Main Course', 'Snack', 'Beverage'])],
     ]);
 
@@ -34,19 +66,15 @@ class MenuController
   }
 
   /**
+   * FITUR UPDATE
    * Mengunggah gambar untuk menu yang sudah ada.
    * Hanya bisa diakses oleh admin.
    */
   public function uploadMenuImage(Request $request, Menu $menu)
   {
-    /** Otorisasi: Cek apakah user yang login adalah admin. */
-    if (Auth::user()->role !== 'admin') {
-      return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
-    }
-
     /** Validasi file gambar. */
     $request->validate([
-      'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+      'image' => ['required', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
     ]);
 
     /** Hapus gambar lama jika ada. */
@@ -61,42 +89,53 @@ class MenuController
     return response()->json([
       'success' => true,
       'message' => 'Image uploaded successfully',
-      'data' => $menu  // Mengembalikan data menu terbaru dengan image_url
+      'data' => $menu
     ]);
   }
 
   /**
-   * Mendapatkan semua menu yang tersedia.
-   * Bisa diakses oleh semua user.
+   * FITUR UPDATE
+   * Mengupdate data menu yang sudah ada.
+   * Hanya bisa diakses oleh admin.
    */
-  public function getAllMenu()
+  public function updateMenu(Request $request, Menu $menu)
   {
     /**
-     * Ambil semua menu. Atribut 'image_url' akan otomatis ditambahkan
-     * oleh Accessor yang kita buat di model.
+     * Validasi: Gunakan 'sometimes' karena ini adalah PATCH.
+     * Artinya, validasi hanya berjalan jika field tersebut dikirim di request.
      */
-    $menus = Menu::all();
+    $validatedData = $request->validate([
+      'name' => [
+        'sometimes',
+        'string',
+        'max:255',
+        Rule::unique('menus')->ignore($menu->id)  // Abaikan nama menu ini sendiri
+      ],
+      'price' => ['sometimes', 'integer', 'min:0'],
+      'stock' => ['sometimes', 'integer', 'min:0'],
+      'type' => ['sometimes', 'string', Rule::in(['Main Course', 'Snack', 'Beverage'])],
+    ]);
 
+    /** Logika Update: Update model menu dengan data yang sudah divalidasi. */
+    $menu->update($validatedData);
+
+    /** Response: Kembalikan response sukses dengan data menu yang sudah terupdate. */
     return response()->json([
       'success' => true,
-      'message' => 'List of all menu items',
-      'data' => $menus
+      'message' => 'Menu updated successfully',
+      'data' => $menu
     ], 200);
   }
 
   /**
+   * FITUR DELETE
    * Menghapus menu berdasarkan ID.
    * Hanya bisa diakses oleh admin.
    */
   public function deleteMenu(Menu $menu)
   {
-    /** Otorisasi: Cek apakah user yang login adalah admin. */
-    if (Auth::user()->role !== 'admin') {
-      return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
-    }
-
     /** Hapus file gambar dari storage jika ada. */
-    if ($menu->image) {
+    if ($menu->image && $menu->image != 'menus/file-not-found-jpg') {
       Storage::disk('public')->delete($menu->image);
     }
 
