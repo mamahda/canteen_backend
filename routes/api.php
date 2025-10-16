@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MenuController;
+use App\Http\Controllers\CartController;
 use Illuminate\Support\Facades\Route;
 
 /**
@@ -43,7 +44,8 @@ Route::middleware('auth:sanctum')->group(function () {
 	 * Rute ini bisa diakses oleh user dengan role 'customer'.
 	 */
 	Route::middleware('role:customer')->group(function () {
-		// Contoh: Route::post('/orders', [OrderController::class, 'store']);
+		Route::get('cart/', [CartController::class, 'showCart']);
+		Route::patch('cart/', [CartController::class, 'addMenutoCart']);
 	});
 
 	/**

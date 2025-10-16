@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Validator;
 class AuthController
 {
 	/**
+	 * FITUR CREATE
 	 * Menangani permintaan registrasi akun baru.
 	 * User baru akan otomatis dibuatkan Cart.
 	 */
@@ -74,6 +75,7 @@ class AuthController
 	}
 
 	/**
+	 * FITUR READ
 	 * Menangani permintaan login user.
 	 */
 	public function login(Request $request)
@@ -120,6 +122,7 @@ class AuthController
 	}
 
 	/**
+	 * FITUR DELETE
 	 * Menangani permintaan logout user.
 	 */
 	public function logout(Request $request)

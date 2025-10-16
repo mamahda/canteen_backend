@@ -34,7 +34,7 @@ class Cart extends Model
      */
     public function menus()
     {
-        return $this->belongsToMany(Menu::class, 'carts_menus')
+        return $this->belongsToMany(Menu::class, 'menu_cart')
                     ->withPivot('quantity', 'subtotal_price');
     }
 }
