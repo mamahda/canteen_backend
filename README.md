@@ -1,61 +1,333 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Canteen Backend API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Backend API untuk sistem manajemen kantin menggunakan Laravel 12 dengan autentikasi Laravel Sanctum.
 
-## About Laravel
+## 📋 Deskripsi Project
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Aplikasi backend untuk sistem kantin yang menyediakan fitur:
+- Autentikasi user (Register, Login, Logout)
+- Manajemen menu makanan dan minuman
+- Keranjang belanja (Cart)
+- Pemesanan (Order)
+- Role-based access control (Admin & User)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🛠️ Tech Stack
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Laravel**: 12.x
+- **PHP**: ^8.2
+- **Database**: MySQL
+- **Authentication**: Laravel Sanctum
+- **API**: RESTful API
 
-## Learning Laravel
+## 📦 Requirements
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Pastikan sistem Anda sudah terinstall:
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+- PHP >= 8.2
+- Composer
+- MySQL/MariaDB
+- Node.js & NPM (untuk Vite)
+- Git
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## 🚀 Instalasi
 
-## Laravel Sponsors
+### 1. Clone Repository
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```bash
+git clone https://github.com/mamahda/canteen_backend.git
+cd canteen_backend
+```
 
-### Premium Partners
+### 2. Install Dependencies
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+```bash
+# Install PHP dependencies
+composer install
 
-## Contributing
+# Install Node dependencies
+npm install
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 3. Setup Environment
 
-## Code of Conduct
+```bash
+# Copy file environment
+cp .env.example .env
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+# Generate application key
+php artisan key:generate
+```
 
-## Security Vulnerabilities
+### 4. Konfigurasi Database
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Edit file `.env` dan sesuaikan konfigurasi database:
 
-## License
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=canteen
+DB_USERNAME=root
+DB_PASSWORD=your_password
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### 5. Buat Database
+
+Buat database baru di MySQL:
+
+```sql
+CREATE DATABASE canteen;
+```
+
+### 6. Jalankan Migration & Seeder
+
+```bash
+# Jalankan migration untuk membuat tabel
+php artisan migrate
+
+# Jalankan seeder untuk data awal
+php artisan db:seed
+```
+
+Seeder akan membuat:
+- 1 akun admin (email: `admin@admin`, password: `admin#123`)
+- Data menu makanan (Main Course, Snack, Beverage)
+
+### 7. Setup Storage
+
+```bash
+# Buat symbolic link untuk storage
+php artisan storage:link
+```
+
+### 8. Jalankan Server
+
+```bash
+# Development server
+php artisan serve
+```
+
+Server akan berjalan di `http://localhost:8000`
+
+## 📁 Struktur Database
+
+### Tabel Users
+- `id`: Primary Key
+- `name`: Nama user
+- `email`: Email (unique)
+- `password`: Password (hashed)
+- `role`: Role user (admin/customer)
+- `remember_token`: Token remember me
+- `timestamps`: created_at, updated_at
+
+### Tabel Menus
+- `id`: Primary Key
+- `name`: Nama menu
+- `price`: Harga
+- `stock`: Stok tersedia
+- `image`: Path gambar
+- `type`: Tipe menu (Main Course, Snack, Beverage)
+- `timestamps`: created_at, updated_at
+
+### Tabel Carts
+- `id`: Primary Key
+- `user_id`: Foreign Key ke users
+- `total_price`: Total harga
+- `timestamps`: created_at, updated_at
+
+### Tabel Orders
+- `id`: Primary Key
+- `user_id`: Foreign Key ke users
+- `status`: Status order (pending, completed, cancelled)
+- `total_price`: Total harga
+- `timestamps`: created_at, updated_at
+
+### Tabel menu_cart (Pivot)
+- `menu_id`: Foreign Key ke menus
+- `cart_id`: Foreign Key ke carts
+- `quantity`: Jumlah item
+- `subtotal_price`: Subtotal harga
+
+### Tabel menu_order (Pivot)
+- `menu_id`: Foreign Key ke menus
+- `order_id`: Foreign Key ke orders
+- `quantity`: Jumlah item
+- `subtotal_price`: Subtotal harga
+
+## 🔌 API Endpoints
+
+### Authentication
+
+#### Register
+```http
+POST /api/register
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "password123"
+}
+```
+
+#### Login
+```http
+POST /api/login
+Content-Type: application/json
+
+{
+  "email": "john@example.com",
+  "password": "password123"
+}
+```
+
+#### Logout
+```http
+POST /api/logout
+Authorization: Bearer {token}
+```
+
+### Menu Management
+
+#### Get All Menus (Public)
+```http
+GET /api/menus
+GET /api/menus?type=Main Course
+```
+
+#### Add Menu (Admin Only)
+```http
+POST /api/menus
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "name": "Nasi Goreng",
+  "price": 15000,
+  "stock": 50,
+  "type": "Main Course"
+}
+```
+
+#### Upload Menu Image (Admin Only)
+```http
+POST /api/menus/{id}/image
+Authorization: Bearer {token}
+Content-Type: multipart/form-data
+
+image: [file]
+```
+
+#### Update Menu (Admin Only)
+```http
+PUT /api/menus/{id}
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "name": "Nasi Goreng Special",
+  "price": 18000,
+  "stock": 45,
+  "type": "Main Course"
+}
+```
+
+#### Delete Menu (Admin Only)
+```http
+DELETE /api/menus/{id}
+Authorization: Bearer {token}
+```
+
+### Cart Management
+
+#### Get Cart
+```http
+GET /api/cart
+Authorization: Bearer {token}
+```
+
+#### Update Cart (Add/Update/Remove items)
+```http
+PATCH /api/cart
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "items": [
+    {
+      "menu_id": 1,
+      "quantity": 2
+    },
+    {
+      "menu_id": 3,
+      "quantity": 0  // 0 untuk menghapus item
+    }
+  ]
+}
+```
+
+## 🔐 Authentication
+
+API menggunakan Laravel Sanctum untuk autentikasi. Setelah login, Anda akan menerima token yang harus disertakan di header setiap request:
+
+```
+Authorization: Bearer {your_token}
+```
+
+## 👥 User Roles
+
+### Admin
+- Mengelola menu (Create, Read, Update, Delete)
+- Upload gambar menu
+- Akses penuh ke semua fitur
+
+### Customer
+- Melihat menu
+- Mengelola cart pribadi
+- Membuat order
+
+## 🧪 Testing
+
+Untuk menjalankan test:
+
+```bash
+php artisan test
+```
+
+## 📝 Catatan Pengembangan
+
+### Default Admin Account
+- Email: `admin@admin`
+- Password: `admin#123`
+
+### File Upload
+- Gambar menu disimpan di `storage/app/public/menus/`
+- Maksimal ukuran file: 2MB
+- Format yang diterima: jpg, jpeg, png
+
+### Middleware
+- `auth:sanctum`: Validasi token autentikasi
+- `role:admin`: Hanya admin yang bisa akses
+- `role:customer`: Hanya customer yang bisa akses
+
+## 🔧 Troubleshooting
+
+### Error: "No application encryption key has been specified"
+```bash
+php artisan key:generate
+```
+
+### Error: Storage link tidak berfungsi
+```bash
+php artisan storage:link
+```
+
+### Error: Migration gagal
+```bash
+php artisan migrate:fresh --seed
+```
+
+### Error: Permission denied pada storage
+```bash
+chmod -R 775 storage bootstrap/cache
+```
