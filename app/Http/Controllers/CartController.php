@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\Menu;
 use App\Models\Cart;
+use App\Models\Menu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -18,90 +18,99 @@ class CartController
   public function showCart()
   {
     $user = Auth::user();
-        $cart = $user->cart;
+    $cart = $user->cart;
 
-        /**
-         * Lakukan "Eager Loading" untuk memuat relasi 'menus'.
-         * Ini akan mengambil semua item menu yang ada di dalam keranjang ini,
-         * lengkap dengan data dari tabel pivot (quantity, subtotal_price).
-         */
-        $cart->load('menus');
+    /**
+     * Lakukan Loading untuk memuat relasi 'menus'.
+     * Ini akan mengambil semua item menu yang ada di dalam keranjang user yang login
+     */
+    $cart->load('menus');
 
-        return response()->json([
-            'success' => true,
-            'message' => 'User cart details retrieved successfully', 
-            'data' => $cart
-        ], 200);
+    return response()->json([
+      'success' => true,
+      'message' => 'User cart details retrieved successfully',
+      'data' => $cart
+    ], 200);
   }
 
   /**
-   * FITUR UPDATE
-   * Menambahkan menu pada keranjang user yang sedang login
+   * FITUR UPDATE, UPDATE, DELETE
+   * Menyelaraskan item di keranjang (menambah, memperbarui, atau menghapus).
+   * Fungsi ini menggabungkan logika add, update, dan delete dalam satu endpoint.
    */
-  public function addMenutoCart(Request $request)
+  public function updateCart(Request $request)
   {
-    /** Validasi input dari user */
-    $validateData = $request->validate([
-      'menu_id' => ['required', 'integer'],
-      'quantity' => ['required', 'integer']
+    /**
+     * Validasi input
+     * Memastikan menu_id ada di database dan quantity minimal 0 (untuk hapus).
+     */
+    $validatedData = $request->validate([
+      'menu_id' => ['required', 'integer', 'exists:menus,id'],
+      'quantity' => ['required', 'integer', 'min:0']
     ]);
 
     $user = Auth::user();
-    $menu = Menu::find($request->menu_id);
     $cart = $user->cart;
-
-    /** Cek ketersediaan stock */
-    if ($menu->stock < $request->quantity) {
-      return response()->json([
-        'success' => false,
-        'message' => 'Stock is not sufficient'
-      ]);
-    }
+    $menuId = $validatedData['menu_id'];
+    $quantity = $validatedData['quantity'];
 
     try {
-      DB::transaction(function () use ($user, $menu, $cart, $request) {
-        /** Cek apakah menu sudah terdaftar pada cart */
-        $menuExist = $cart->menus()->where('menu_id', $menu->id)->first();
+      $cartData = DB::transaction(function () use ($cart, $menuId, $quantity) {
+        $menu = Menu::find($menuId);
 
-        if ($menuExist) {
-          /** Jika ada update jumlah quantity dan total harga menu pada tabel pivot (menu_cart) */
-          $newQuantity = $menuExist->pivot->quantity + $request->quantity;
-          $newSubPrice = $menu->price * $newQuantity;
+        if ($quantity > 0) {
+          /** Blok logika untuk menambah atau memperbarui item. */
 
-          /** Cek apakah stock tersedia dengan quantity yang baru */
-          if ($newQuantity > $menu->stock) {
-            throw new \exception('Stock is not sufficient');
+          /**
+           * Cek ketersediaan stok. Jika tidak cukup, lempar exception
+           * untuk membatalkan transaksi secara otomatis.
+           */
+          if ($menu->stock < $quantity) {
+            throw new \Exception('Stock is not sufficient');
           }
 
-          /** Update quantity dan subtotal_price dari tabel pivot */
-          $cart->menus()->updateExistingPivot($menu->id, [
-            'quantity' => $newQuantity,
-            'subtotal_price' => $newSubPrice,
-            'unit_price' => $menu->price
+          $subtotalPrice = $quantity * $menu->price;
+
+          /**
+           * Gunakan syncWithoutDetaching untuk "update atau create".
+           * Jika item belum ada, akan ditambahkan. Jika sudah ada, akan di-update.
+           */
+          $cart->menus()->syncWithoutDetaching([
+            $menuId => [
+              'quantity' => $quantity,
+              'subtotal_price' => $subtotalPrice,
+              'unit_price' => $menu->price
+            ]
           ]);
         } else {
-          /** Jika tidak ada attach tabel pivot baru */
-          $subPrice = $request->quantity * $menu->price;
-          $cart->menus()->attach($menu->id, [
-            'quantity' => $request->quantity,
-            'subtotal_price' => $subPrice,
-            'unit_price' => $menu->price
-          ]);
+          /** Blok logika untuk menghapus item dari keranjang jika quantity adalah 0. */
+          $cart->menus()->detach($menuId);
         }
-        /** Hitung dan update total harga pada cart */
+
+        /**
+         * Hitung ulang dan update total harga pada keranjang.
+         * Ini dijalankan setiap kali ada perubahan (tambah, update, atau hapus).
+         */
         $totalPrice = $cart->menus()->sum('subtotal_price');
         $cart->update(['total_price' => $totalPrice]);
+
+        /** Kembalikan objek cart dari dalam closure transaksi. */
+        return $cart;
       });
 
-      /** Muat ulang relasi untuk mendapatkan data terbaru */
-      $cart->load('menus');
+      /** Muat ulang relasi 'menus' untuk memastikan data yang dikembalikan adalah yang terbaru. */
+      $cartData->load('menus');
 
       return response()->json([
         'success' => true,
-        'message' => 'Item added to cart successfully',
-        'data' => $cart
+        'message' => 'Cart updated successfully',
+        'data' => $cartData
       ], 200);
-    } catch (\exception $e) {
+    } catch (\Exception $e) {
+      /**
+       * Tangkap semua exception yang terjadi di dalam transaksi
+       * (misalnya error stok) dan kembalikan sebagai response error.
+       */
       return response()->json([
         'success' => false,
         'message' => $e->getMessage()

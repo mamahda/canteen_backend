@@ -45,7 +45,7 @@ Route::middleware('auth:sanctum')->group(function () {
 	 */
 	Route::middleware('role:customer')->group(function () {
 		Route::get('cart/', [CartController::class, 'showCart']);
-		Route::patch('cart/', [CartController::class, 'addMenutoCart']);
+		Route::patch('cart/', [CartController::class, 'updateCart']);
 	});
 
 	/**

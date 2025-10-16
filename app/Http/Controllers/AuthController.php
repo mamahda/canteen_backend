@@ -69,7 +69,7 @@ class AuthController
 			return response()->json([
 				'success' => false,
 				'message' => 'Registration failed. Please try again.',
-				'error' => $e->getMessage()  // Opsional: hanya untuk debugging
+				'error' => $e->getMessage() 
 			], 500);
 		}
 	}
@@ -104,8 +104,8 @@ class AuthController
 
 		/**
 		 * Menghapus semua token lama dan membuat yang baru.
-		 * Ini adalah strategi keamanan untuk memastikan user hanya memiliki
-		 * satu sesi aktif, sehingga otomatis logout dari perangkat lain.
+		 * untuk memastikan user hanya memiliki satu sesi aktif, 
+		 * sehingga otomatis logout dari perangkat lain.
 		 */
 		$user->tokens()->delete();
 		$token = $user->createToken('auth_token')->plainTextToken;
@@ -128,8 +128,8 @@ class AuthController
 	public function logout(Request $request)
 	{
 		/**
-		 * Menggunakan $request->user() adalah cara modern untuk mendapatkan
-		 * user yang terotentikasi dari request API yang dilindungi Sanctum.
+		 * Menggunakan $request->user() untuk mendapatkan user yang
+		 * terotentikasi dari request API yang dilindungi Sanctum.
 		 */
 		$user = $request->user();
 
