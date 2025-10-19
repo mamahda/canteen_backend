@@ -3,6 +3,8 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\OrderAdminController;
+use App\Http\Controllers\OrderUserController;
 use Illuminate\Support\Facades\Route;
 
 /**
@@ -24,7 +26,7 @@ Route::post('/login', [AuthController::class, 'login']);
 /** 
  * Rute untuk menampilkan semua menu 
  */
-Route::get('/menus', [MenuController::class, 'getAllMenu']); 
+Route::get('/menus', [MenuController::class, 'showAllMenu']); 
 
 /**
  * Rute Terproteksi (Membutuhkan Otentikasi Sanctum)
@@ -34,18 +36,24 @@ Route::middleware('auth:sanctum')->group(function () {
 	 * Rute ini hanya bisa diakses oleh user dengan role 'admin'.
 	 */
 	Route::middleware('role:admin')->group(function () {
-		Route::post('/menus', [MenuController::class, 'addMenu']);
-		Route::post('/menus/image/{menu}', [MenuController::class, 'uploadMenuImage']); 
-		Route::patch('/menus/{menu}', [MenuController::class, 'updateMenu']);
-		Route::delete('/menus/{menu}', [MenuController::class, 'deleteMenu']);
+		Route::post('/admin/menus', [MenuController::class, 'addMenu']);
+		Route::post('/admin/menus/image/{menu}', [MenuController::class, 'uploadMenuImage']); 
+		Route::patch('/admin/menus/{menu}', [MenuController::class, 'updateMenu']);
+		Route::delete('/admin/menus/{menu}', [MenuController::class, 'deleteMenu']);
+
+		Route::patch('admin/orders/{order}', [OrderAdminController::class, 'updateStatus']);
 	});
 
 	/**
 	 * Rute ini bisa diakses oleh user dengan role 'customer'.
 	 */
 	Route::middleware('role:customer')->group(function () {
-		Route::get('cart/', [CartController::class, 'showCart']);
-		Route::patch('cart/', [CartController::class, 'updateCart']);
+		Route::get('carts/', [CartController::class, 'showCart']);
+		Route::patch('carts/', [CartController::class, 'updateCart']);
+
+		Route::get('orders/', [OrderUserController::class, 'showOrder']);
+		Route::post('orders/', [OrderUserController::class, 'createOrder']);
+		Route::patch('orders/{order}', [OrderUserController::class, 'requestCancellation']);
 	});
 
 	/**

@@ -20,6 +20,7 @@ class MenuFactory extends Factory
 			'name' => $this->faker->word(),
 			'price' => $this->faker->numberBetween(5000, 50000),
 			'stock' => $this->faker->numberBetween(1, 100),
+			'description' => 'No Description',
 			'type' => $this->faker->randomElement(['Main Course', 'Snack', 'Beverage']),
 		];
 	}

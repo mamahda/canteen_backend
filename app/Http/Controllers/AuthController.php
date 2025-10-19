@@ -48,17 +48,12 @@ class AuthController
 				return $createdUser;
 			});
 
-			/** Buat token otentikasi baru untuk user menggunakan Sanctum. */
-			$token = $user->createToken('auth_token')->plainTextToken;
-
 			/** Kirim response JSON yang berisi data user dan token. */
 			return response()->json([
 				'success' => true,
 				'message' => 'User registered successfully',
 				'data' => [
 					'user' => $user,
-					'token' => $token,
-					'token_type' => 'Bearer',
 				]
 			], 201);
 		} catch (\Exception $e) {

@@ -37,6 +37,6 @@ class Order extends Model
   {
     return $this
       ->belongsToMany(Menu::class, 'menu_order')
-      ->withPivot('quantity', 'subtotal_price');
+      ->withPivot('quantity', 'subtotal_price', 'unit_price');
   }
 }

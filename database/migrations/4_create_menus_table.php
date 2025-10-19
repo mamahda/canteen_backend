@@ -15,8 +15,9 @@ return new class extends Migration {
 			$table->string('name');
 			$table->integer('price');
 			$table->integer('stock');
-			$table->string('image')->nullable();  // Gambar bisa jadi opsional
-			$table->string('type');  // Contoh: 'main Course', 'snack', 'beverage'
+			$table->string('image')->nullable(); 
+			$table->string('description'); 
+			$table->string('type');
 			$table->timestamps();
 		});
 	}

@@ -15,7 +15,7 @@ class MenuController
    * Mendapatkan semua menu yang tersedia.
    * Bisa diakses oleh semua user.
    */
-  public function getAllMenu(Request $request)
+  public function showAllMenu(Request $request)
   {
     /**
      * Ambil nilai dari query parameter 'type'.

@@ -37,6 +37,6 @@ class Menu extends Model
     }
 
     // Ganti dengan path gambar default Anda
-    return asset('storage/menus/file-not-found.jpg');
+    return Storage::disk('public')->url('menus/file-not-found.jpg');
   }
 }
