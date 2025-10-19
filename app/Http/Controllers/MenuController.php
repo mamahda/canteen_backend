@@ -17,22 +17,23 @@ class MenuController
    */
   public function showAllMenu(Request $request)
   {
-    /**
-     * Ambil nilai dari query parameter 'type'.
-     * Jika tidak ada, nilainya akan null.
-     */
-    $tipeFilter = $request->query('type');
+    /** Validasi opsional untuk parameter. */
+    $request->validate([
+      'type' => 'nullable|string|in:Main Course,Snack,Beverage',
+      'name' => 'nullable|string|max:100'  
+    ]);
 
-    /** Mulai query builder */
-    $query = Menu::query();
-
-    /** Jika parameter 'type' ada isinya, tambahkan filter ke query */
-    if ($tipeFilter) {
-      $query->where('type', $tipeFilter);
-    }
-
-    /** Eksekusi query dan ambil hasilnya */
-    $menus = $query->get();
+    $menus = Menu::query()
+      /** Filter berdasarkan tipe (jika ada) */
+      ->when($request->query('type'), function ($query, $type) {
+        return $query->where('type', $type);
+      })
+      /** Filter berdasarkan nama (jika ada) */
+      ->when($request->query('name'), function ($query, $name) {
+        $searchTerm = strtolower($name);
+        return $query->whereRaw('LOWER(name) LIKE ?', ["%{$searchTerm}%"]);
+      })
+      ->get();
 
     return response()->json([
       'success' => true,
