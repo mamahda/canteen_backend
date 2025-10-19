@@ -1,6 +1,7 @@
 # Canteen Backend API
 
-Backend API untuk sistem manajemen kantin menggunakan Laravel 12 dengan autentikasi Laravel Sanctum.
+Backend API untuk sistem manajemen kantin menggunakan Laravel 12 dengan autentikasi Laravel Sanctum. <br> 
+postman documentation: [here](https://documenter.getpostman.com/view/49258155/2sB3QNo89C#7a02e426-84b7-43ea-aefc-b78610a6f459)
 
 ## 📋 Deskripsi Project
 
@@ -13,7 +14,7 @@ Aplikasi backend untuk sistem kantin yang menyediakan fitur:
 
 ## 🛠️ Tech Stack
 
-- **Laravel**: 12.x
+- **Laravel**: 12.33
 - **PHP**: ^8.2
 - **Database**: MySQL
 - **Authentication**: Laravel Sanctum
@@ -25,8 +26,7 @@ Pastikan sistem Anda sudah terinstall:
 
 - PHP >= 8.2
 - Composer
-- MySQL/MariaDB
-- Node.js & NPM (untuk Vite)
+- MySQL
 - Git
 
 ## 🚀 Instalasi
@@ -43,9 +43,6 @@ cd canteen_backend
 ```bash
 # Install PHP dependencies
 composer install
-
-# Install Node dependencies
-npm install
 ```
 
 ### 3. Setup Environment
@@ -53,9 +50,6 @@ npm install
 ```bash
 # Copy file environment
 cp .env.example .env
-
-# Generate application key
-php artisan key:generate
 ```
 
 ### 4. Konfigurasi Database
@@ -126,6 +120,7 @@ Server akan berjalan di `http://localhost:8000`
 - `price`: Harga
 - `stock`: Stok tersedia
 - `image`: Path gambar
+- `description`: Deskripsi menu
 - `type`: Tipe menu (Main Course, Snack, Beverage)
 - `timestamps`: created_at, updated_at
 
@@ -147,124 +142,14 @@ Server akan berjalan di `http://localhost:8000`
 - `cart_id`: Foreign Key ke carts
 - `quantity`: Jumlah item
 - `subtotal_price`: Subtotal harga
+- `unit_price`: Harga per unit
 
 ### Tabel menu_order (Pivot)
 - `menu_id`: Foreign Key ke menus
 - `order_id`: Foreign Key ke orders
 - `quantity`: Jumlah item
 - `subtotal_price`: Subtotal harga
-
-## 🔌 API Endpoints
-
-### Authentication
-
-#### Register
-```http
-POST /api/register
-Content-Type: application/json
-
-{
-  "name": "John Doe",
-  "email": "john@example.com",
-  "password": "password123"
-}
-```
-
-#### Login
-```http
-POST /api/login
-Content-Type: application/json
-
-{
-  "email": "john@example.com",
-  "password": "password123"
-}
-```
-
-#### Logout
-```http
-POST /api/logout
-Authorization: Bearer {token}
-```
-
-### Menu Management
-
-#### Get All Menus (Public)
-```http
-GET /api/menus
-GET /api/menus?type=Main Course
-```
-
-#### Add Menu (Admin Only)
-```http
-POST /api/menus
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-  "name": "Nasi Goreng",
-  "price": 15000,
-  "stock": 50,
-  "type": "Main Course"
-}
-```
-
-#### Upload Menu Image (Admin Only)
-```http
-POST /api/menus/{id}/image
-Authorization: Bearer {token}
-Content-Type: multipart/form-data
-
-image: [file]
-```
-
-#### Update Menu (Admin Only)
-```http
-PUT /api/menus/{id}
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-  "name": "Nasi Goreng Special",
-  "price": 18000,
-  "stock": 45,
-  "type": "Main Course"
-}
-```
-
-#### Delete Menu (Admin Only)
-```http
-DELETE /api/menus/{id}
-Authorization: Bearer {token}
-```
-
-### Cart Management
-
-#### Get Cart
-```http
-GET /api/cart
-Authorization: Bearer {token}
-```
-
-#### Update Cart (Add/Update/Remove items)
-```http
-PATCH /api/cart
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-  "items": [
-    {
-      "menu_id": 1,
-      "quantity": 2
-    },
-    {
-      "menu_id": 3,
-      "quantity": 0  // 0 untuk menghapus item
-    }
-  ]
-}
-```
+- `unit_price`: Harga per unit
 
 ## 🔐 Authentication
 
