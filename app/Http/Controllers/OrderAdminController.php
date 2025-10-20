@@ -10,6 +10,20 @@ use Illuminate\Validation\Rule;
 class OrderAdminController
 {
   /**
+   * FITUR GET
+   * Mendapatkan list order smua user
+   */
+  public function showAllOrder(){
+    $order = Order::with(['user', 'menus'])->latest()->get();
+
+    return response()->json([
+      'success' => true,
+      'message' => 'Show all user order',
+      'data' => $order
+    ], 200);
+  }
+
+  /**
    * Mengupdate status pesanan.
    * Endpoint ini menangani semua perubahan status oleh admin,
    * termasuk menerima/menolak permintaan pembatalan.

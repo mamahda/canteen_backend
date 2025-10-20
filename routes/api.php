@@ -28,6 +28,7 @@ Route::post('/login', [AuthController::class, 'login']);
  */
 Route::get('/menus', [MenuController::class, 'showAllMenu']); 
 
+
 /**
  * Rute Terproteksi (Membutuhkan Otentikasi Sanctum)
  */
@@ -42,6 +43,7 @@ Route::middleware('auth:sanctum')->group(function () {
 		Route::delete('/admin/menus/{menu}', [MenuController::class, 'deleteMenu']);
 
 		Route::patch('admin/orders/{order}', [OrderAdminController::class, 'updateStatus']);
+		Route::get('/admin/orders', [OrderAdminController::class, 'showAllOrder']);
 	});
 
 	/**
