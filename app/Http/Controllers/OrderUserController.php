@@ -125,7 +125,7 @@ class OrderUserController
 		}
 
 		/** Update status */
-		$order->update(['status' => 'Request Cancellation']);
+		$order->update(['status' => 'Cancelled']);
 
 		/** Kembalikan response sukses */
 		return response()->json([
