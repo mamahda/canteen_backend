@@ -25,11 +25,20 @@ class CartController
      * Ini akan mengambil semua item menu yang ada di dalam keranjang user yang login
      */
     $cart->load('menus');
+    $itemCount = $cart->menus->count();
+    $totalQuantity = $cart->menus->sum('pivot.quantity');
 
     return response()->json([
       'success' => true,
       'message' => 'User cart details retrieved successfully',
-      'data' => $cart
+      'data' => [
+        'cart_id' => $cart->id,
+        'total_price' => $cart->total_price,
+        'user_id' => $cart->user_id,
+        'menu_count' => $itemCount, 
+        'menu_quantity' => (int) $totalQuantity,
+        'menus' => $cart->menus 
+      ]
     ], 200);
   }
 
